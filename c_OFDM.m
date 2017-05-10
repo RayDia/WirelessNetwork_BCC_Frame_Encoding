@@ -38,7 +38,7 @@ ofdmS = [zeros(6,6) ; eD(1:5,:) ; pilts; eD(6:18,:) ;  % p-21
 
 % ofdmS   is a 64x6 matrix of complex numbers. one coumn per symbol
     
-%   Table L-20—Frequency domain of first DATA symbol
+%   Table L-20?requency domain of first DATA symbol
 
 fs1 = reshape(ofdmS(:,1), 16,4) ; % reshape the first symbol as in L-20
 k = (0:15)' ; 
@@ -55,8 +55,19 @@ save c_ofdmS ofdmS
 SmblT = ifft(ofdmS) ;  % inverse Fourier transform fix it!
 
 msg_1stSmbl = real(SmblT(:,1)) ;
+% a cyclic extension of the time signal, real part: see slide 18
+%The time guard is formed by the cyclic extension of the time domain OFDM symbol s(1) ... s(64):
+%? The resulting time vector has 81 time samples.
+ss = SmblT(:, 5);
+s_t = ([ss(49:64); ss]); % s(49) ... s(64)|s(1) ... s(64)|s(1)
 
 % Produce Table L-25
+fs1 = reshape(s_t, 20,4) ; % reshape the first symbol as in L-25
+k = (0:19)' ; 
+TableL20 = [num2str(k * 4,  '%3d|') num2str(fs1(:,1), '%6.3f') ...
+            num2str(k * 4 + 1, '|%4d|') num2str(fs1(:,2), '%6.3f') ...
+            num2str(k * 4 + 2,    '|%4d|') num2str(fs1(:,3), '%6.3f') ...
+            num2str(k * 4 + 3, '|%4d|') num2str(fs1(:,4), '%6.3f') ];
 
 %  Plotting the first symbol in time
 dt = 3.2/64 ;  % microseconds
